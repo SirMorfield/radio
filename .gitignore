@@ -1,0 +1,16 @@
+# framework, editor, macos, cache ed.
+*.log
+npm-debug.log*
+.DS_Store*
+node_modules/
+.npm
+.eslintcache
+package-lock.json
+*.pem
+.vscode/
+temp.*
+test.*
+.node-persist/
+
+# radio
+stations.json
