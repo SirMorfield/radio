@@ -1,0 +1,61 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>radio</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/socket.io.min.js"></script>
+</head>
+
+<body>
+  <div id="stationsBox">
+    <% const stations = JSON.parse(stationsStr) %>
+    <% for(const station in stations) { %>
+    <div class="station" id="<%=station%>">
+      <div class="stationText">
+        <div class="stationName">
+          <%= station %>
+        </div>
+        <%= stations[station].score %>% original
+        <br>
+        <%= stations[station].numOriginalSongs %> / <%= stations[station].numAllSongs %>
+        <br>
+        Now playing:
+        <br>
+        <div class="nowPlaying" style="display: inline"><%= stations[station].latestSong.name %> - <%= stations[station].latestSong.artist %></div>
+        <div class="ago" style="float: right; display: inline">0 seconds ago</div>
+      </div>
+      <textarea class="songs"><%= station %>: <%= JSON.stringify(stations[station].songs, null, 2) %></textarea>
+    </div>
+    <%}%>
+  </div>
+  <script>
+    const socket = io()
+    socket.on('stationData', (data) => {
+      // document.querySelector(`#${data.station} > textarea`).innerHTML = JSON.stringify(data.parsed, null, 2)
+    })
+
+    socket.on('nowPlaying', ({ song, station }) => {
+      document.querySelector(`#${station} > div > div.nowPlaying`).innerHTML = '0 seconds ago'
+
+    })
+
+    setInterval(() => {
+      const blocks = document.getElementsByClassName('ago')
+      for (let i = 0; i < blocks.length; i++) {
+        let old = blocks[i].innerHTML
+        old = old.match(/\d/g)
+        old = old.join('')
+        old = parseInt(old)
+        blocks[i].innerHTML = `${old + 1} seconds ago`
+      }
+    }, 1000);
+
+
+  </script>
+
+</body>
+
+</html>

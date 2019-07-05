@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon ./app.js --config configs/nodemon.json",
+    "production": "NODE_ENV=production pm2 start app.js 8081"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,15 @@
   "bugs": {
     "url": "https://github.com/SirMorfield/radio/issues"
   },
-  "homepage": "https://github.com/SirMorfield/radio#readme"
+  "homepage": "https://github.com/SirMorfield/radio#readme",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "http": "0.0.0",
+    "lowdb": "^1.0.0",
+    "nodemon": "^1.19.0",
+    "path": "^0.12.7",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0"
+  }
 }
