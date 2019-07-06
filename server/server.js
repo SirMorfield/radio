@@ -3,7 +3,7 @@ module.exports = async (httpServer, parse) => {
   const ioServer = require('socket.io')(httpServer)
   const low = require('lowdb')
   const FileAsync = require('lowdb/adapters/FileAsync')
-  const adapter = new FileAsync('stations.json', {
+  const adapter = new FileAsync('server/stations.json', {
     serialize: (array) => JSON.stringify(array),
     deserialize: (string) => JSON.parse(string)
   })
@@ -11,15 +11,13 @@ module.exports = async (httpServer, parse) => {
 
   const stations = [
     { name: "x100p-nl", id: 46 },
-    // { name: "qmusic", id: 68 },
-    // { name: "radio-2", id: 220 },
-    // { name: "radio-3fm", id: 69 },
-    // { name: "radio-538", id: 67 },
-    // { name: "radio-veronica", id: 120 },
-    // { name: "sky-radio", id: 117 },
-    // { name: "slam", id: 82 },
-    // { name: "sublime-fm", id: 182 },
-    // { name: "arrow-classic-rock", id: 223 }
+    { name: "qmusic", id: 68 },
+    { name: "radio-538", id: 67 },
+    { name: "radio-veronica", id: 120 },
+    { name: "sky-radio", id: 117 },
+    { name: "slam", id: 82 },
+    { name: "sublime-fm", id: 182 },
+    { name: "arrow-classic-rock", id: 223 }
   ]
 
   let defaults = {}
@@ -49,6 +47,7 @@ module.exports = async (httpServer, parse) => {
 
     socket.on('streaminfo', async (data) => {
       const info = data.split(' - ')
+      if (info.length < 2) return
       const song = {
         name: info[1],
         artist: info[0],
@@ -57,7 +56,7 @@ module.exports = async (httpServer, parse) => {
       await saveSong(song, station.name)
       ioServer.emit('nowPlaying', { song, station: station.name })
 
-      const parsed = await parse.cleanupStations(station)
+      const parsed = await parse.cleanupStations(station.name)
       ioServer.emit('stationData', { station: station.name, parsed })
     })
   })

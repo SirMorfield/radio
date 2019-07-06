@@ -12,34 +12,34 @@
 <body>
   <div id="stationsBox">
     <% const stations = JSON.parse(stationsStr) %>
-    <% for(const station in stations) { %>
-    <div class="station" id="<%=station%>">
+    <% for(const stationName in stations) { %>
+    <% const station = stations[stationName] %>
+    <div class="station" id="<%=stationName%>">
       <div class="stationText">
         <div class="stationName">
-          <%= station %>
+          <%= stationName %>
         </div>
-        <%= stations[station].score %>% original
+        <b>Original: </b> <%= station.numOriginalSongs %> / <%= station.numAllSongs %> (<%= station.score %>%)
         <br>
-        <%= stations[station].numOriginalSongs %> / <%= stations[station].numAllSongs %>
+        <b> Now playing:</b>
         <br>
-        Now playing:
-        <br>
-        <div class="nowPlaying" style="display: inline"><%= stations[station].latestSong.name %> - <%= stations[station].latestSong.artist %></div>
-        <div class="ago" style="float: right; display: inline">0 seconds ago</div>
+        <div class="nowPlaying" style="display: inline"><%= station.lastSong.name %> - <%= station.lastSong.artist %></div>
+        <% const secondsAgo = station.lastSong.dates[0] != 0 ? Math.floor((Date.now() - station.lastSong.dates[0]) / 1000) : 0 %>
+        <div class="ago" style="float: right; display: inline"><%=secondsAgo%> seconds ago</div>
       </div>
-      <textarea class="songs"><%= station %>: <%= JSON.stringify(stations[station].songs, null, 2) %></textarea>
+      <textarea class="songs"><%= stationName %>: <%= JSON.stringify(station.songs, null, 2) %></textarea>
     </div>
     <%}%>
   </div>
   <script>
     const socket = io()
     socket.on('stationData', (data) => {
-      // document.querySelector(`#${data.station} > textarea`).innerHTML = JSON.stringify(data.parsed, null, 2)
+      document.querySelector(`#${data.station} > textarea`).innerHTML = JSON.stringify(data.parsed, null, 2)
     })
 
     socket.on('nowPlaying', ({ song, station }) => {
-      document.querySelector(`#${station} > div > div.nowPlaying`).innerHTML = '0 seconds ago'
-
+      document.querySelector(`#${station} > div > div.ago`).innerHTML = '1 seconds ago'
+      document.querySelector(`#${station} > div > div.nowPlaying`).innerHTML = `${song.name} - ${song.artist}`
     })
 
     setInterval(() => {
@@ -49,7 +49,9 @@
         old = old.match(/\d/g)
         old = old.join('')
         old = parseInt(old)
-        blocks[i].innerHTML = `${old + 1} seconds ago`
+        if (old !== 0) {
+          blocks[i].innerHTML = `${old + 1} seconds ago`
+        }
       }
     }, 1000);
 

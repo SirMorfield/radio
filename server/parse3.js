@@ -9,11 +9,14 @@ exports.cleanupStations = async (stationName) => {
   for (let station in stations) {
     let originalSongs = []
     let numAllSongs = 0
-    let latestSong = { dates: [0], name: '', artist: '' }
+    let latestSong = { dates: [0], lastDate: 0, name: '', artist: '' }
     stations[station].forEach(song => {
       if (song.error) return
-      numAllSongs += 1
+      numAllSongs++
       latestSong = song
+      // instead of giving array of when song was played, give a int of when it was last played
+      latestSong.lastDate = song.dates[song.dates.length - 1]
+
       if (originalSongs.length === 0) {
         originalSongs.push(song)
         return
@@ -28,11 +31,11 @@ exports.cleanupStations = async (stationName) => {
     originalSongs.sort((a, b) => b.length - a.length)
 
     let newStation = {
-      score: originalSongs.length == 0 || numAllSongs == 0 ? '0.0' : (originalSongs.length / numAllSongs * 100).toFixed(1),
+      score: originalSongs.length == 0 || numAllSongs == 0 ? 0 : parseFloat((originalSongs.length / numAllSongs * 100).toFixed(1)),
       numOriginalSongs: originalSongs.length,
       numAllSongs: numAllSongs,
-      latestSong: latestSong,
-      songs: originalSongs
+      songs: originalSongs,
+      latestSong: latestSong
     }
     sortedStations[station] = newStation
   }

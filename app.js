@@ -14,13 +14,13 @@
   const http = require('http')
   const httpServer = http.createServer(app)
 
-  const parse = require('./parse.js')
+  const parse = require(path.join(__dirname, '/server/parse.js'))
   app.use('/', async (req, res) => {
     const parsed = await parse.cleanupStations()
     res.render('index.ejs', { stationsStr: JSON.stringify(parsed) })
   })
 
-  const server = await require('./server')(httpServer, parse)
+  await require(path.join(__dirname, '/server/server.js'))(httpServer, parse)
 
   httpServer.listen(parseInt(process.argv[2]) || 8080)
 })()
